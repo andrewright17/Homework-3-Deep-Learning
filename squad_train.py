@@ -7,14 +7,11 @@ from accelerate import Accelerator
 #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 accelerator = Accelerator(mixed_precision='no')
 
-#model_name = 'bert-base-uncased'
+model_name = 'bert-base-uncased'
 
 # Load the tokenizer and model
 #tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-#model = BertForQuestionAnswering.from_pretrained(model_name)
-
-#if accelerator.device.type == "cuda":
-#    model.to(accelerator.device)
+model = BertForQuestionAnswering.from_pretrained(model_name)
 
 print(accelerator.device)
