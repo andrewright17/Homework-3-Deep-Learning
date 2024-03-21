@@ -123,7 +123,7 @@ def main():
         model, optimizer, trainloader
     )
 
-    num_train_epochs = 1
+    num_train_epochs = 3
     num_update_steps_per_epoch = len(trainloader)
     num_training_steps = num_train_epochs * num_update_steps_per_epoch
 
