@@ -39,7 +39,7 @@ class SpokenSQuAD(Dataset):
             ids = []
 
             for title in data:
-                for paragraph in title['parageraphs']:
+                for paragraph in title['paragraphs']:
                     context = paragraph['context']
                     for qas in paragraph['qas']:
                         question = qas['question']
