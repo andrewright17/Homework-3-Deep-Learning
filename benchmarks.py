@@ -39,7 +39,7 @@ def preprocess_squad_valid_examples(examples):
             o if sequence_ids[k] == 1 else None for k,o in enumerate(offset)
         ]
         inputs["example_id"] = example_ids
-        return inputs
+    return inputs
 
 def compute_f1(start_logits, end_logits, features, examples):
     n_best = 20
@@ -87,15 +87,15 @@ def main():
     squad = load_dataset("squad")
     squad_valid = squad["validation"].map(
         preprocess_squad_valid_examples,
-        batched = True,
-        remove_columns = squad["validation"].column_names,
+        batched=True,
+        remove_columns=squad["validation"].column_names,
     )
     squad_model_checkpoint_path = 'checkpoints/squad/'
     spoken_model_checkpoint_path = 'checkpoints/spoken_squad/'
 
     squad_valid_set = squad_valid.remove_columns(["example_id", "offset_mapping"])
     squad_valid_set.set_format("torch")
-    squad_bert = BertForQuestionAnswering.from_pretrained(squad_model_checkpoint_path+'bert-based-uncased')
+    squad_bert = BertForQuestionAnswering.from_pretrained(squad_model_checkpoint_path+'bert-base-uncased')
     spoken_bert = BertForQuestionAnswering.from_pretrained(spoken_model_checkpoint_path+'bert-base-uncased')
 
     squad_eval_loader = DataLoader(
@@ -122,7 +122,7 @@ def main():
     start_logits = start_logits[: len(squad_valid_set)]
     end_logits = end_logits[: len(squad_valid_set)]
     metrics = compute_f1(
-        start_logits=start_logits, end_logits=end_logits, features=squad_valid_set, examples=squad["validation"]
+        start_logits=start_logits, end_logits=end_logits, features=squad_valid, examples=squad["validation"]
     )
     print(metrics)
 
@@ -139,7 +139,7 @@ def main():
     start_logits = start_logits[: len(squad_valid_set)]
     end_logits = end_logits[: len(squad_valid_set)]
     metrics = compute_f1(
-        start_logits=start_logits, end_logits=end_logits, features=squad_valid_set, examples=squad["validation"]
+        start_logits=start_logits, end_logits=end_logits, features=squad_valid, examples=squad["validation"]
     )
     print(metrics)
 
