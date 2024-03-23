@@ -142,3 +142,6 @@ def main():
         start_logits=start_logits, end_logits=end_logits, features=squad_valid_set, examples=squad["validation"]
     )
     print(metrics)
+
+if __name__=='__main__':
+    main()
