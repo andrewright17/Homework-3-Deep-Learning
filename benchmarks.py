@@ -84,7 +84,7 @@ def compute_f1(start_logits, end_logits, features, examples):
     return metric.compute(predictions=predicted_answers, references= theoretical_answers)
 
 def main():
-    squad = load_dataset.("squad")
+    squad = load_dataset("squad")
     squad_valid = squad["validation"].map(
         preprocess_squad_valid_examples,
         batched = True,
@@ -106,4 +106,39 @@ def main():
     accelerator = Accelerator(mixed_precision='no')
     squad_bert, spoken_bert, squad_eval_loader = accelerator.prepare(squad_bert, spoken_bert, squad_eval_loader)
 
-    
+    squad_bert.eval()
+    spoken_bert.eval()
+
+    start_logits = []
+    end_logits = []
+    accelerator.print("Evaluation of squad_bert:")
+    for batch in tqdm(squad_eval_loader):
+        with torch.no_grad():
+            outputs = squad_bert(**batch)
+        start_logits.append(accelerator.gather(outputs.start_logits).cpu().numpy())
+        end_logits.append(accelerator.gather(outputs.end_logits).cpu().numpy())
+    start_logits = np.concatenate(start_logits)
+    end_logits = np.concatenate(end_logits)
+    start_logits = start_logits[: len(squad_valid_set)]
+    end_logits = end_logits[: len(squad_valid_set)]
+    metrics = compute_f1(
+        start_logits=start_logits, end_logits=end_logits, features=squad_valid_set, examples=squad["validation"]
+    )
+    print(metrics)
+
+    start_logits = []
+    end_logits = []
+    accelerator.print("Evaluation of spoken_bert:")
+    for batch in tqdm(squad_eval_loader):
+        with torch.no_grad():
+            outputs = spoken_bert(**batch)
+        start_logits.append(accelerator.gather(outputs.start_logits).cpu().numpy())
+        end_logits.append(accelerator.gather(outputs.end_logits).cpu().numpy())
+    start_logits = np.concatenate(start_logits)
+    end_logits = np.concatenate(end_logits)
+    start_logits = start_logits[: len(squad_valid_set)]
+    end_logits = end_logits[: len(squad_valid_set)]
+    metrics = compute_f1(
+        start_logits=start_logits, end_logits=end_logits, features=squad_valid_set, examples=squad["validation"]
+    )
+    print(metrics)
